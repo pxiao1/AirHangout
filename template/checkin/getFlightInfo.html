@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <title>GetFlightStatus example</title>
+        <script type="text/javascript">
+            
+            var carrier;
+            var flight;
+            var year;
+            var month;
+            var day;
+            var button1 = 0;
+            
+            function getHTTPObject(){
+                var xmlhttp;
+                if (window.XMLHttpRequest){
+                    xmlhttp = new XMLHttpRequest();
+                    return xmlhttp;
+                }else{
+                    xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+                    return xmlhttp;
+                }
+            }
+            
+            function findMyFriend(){
+                var xmlhttp = getHTTPObject();
+                
+                document.getElementById("adiv3").innerHTML = '';
+                xmlhttp.onreadystatechange = function(){
+                    if(xmlhttp.readyState==4 && xmlhttp.status==200){
+                        document.getElementById("adiv3").innerHTML = xmlhttp.responseText;
+                    }
+                }
+                var url = 'findfriends/'+carrier+'/'+flight;
+                xmlhttp.open('GET',url,true);
+                xmlhttp.send();
+            }
+                
+            
+            function AddElement(mytype,myvalue){
+                var mytype,TemO=document.getElementById("adiv2");
+                var newInput = document.createElement("input");
+                newInput.type=mytype;
+                newInput.name=myvalue;
+                newInput.value=myvalue;
+                newInput.setAttribute("onclick","findMyFriend()");
+                TemO.appendChild(newInput);
+                var newline= document.createElement("br");
+                TemO.appendChild(newline);
+            }
+            
+            function getFlightStatus(){
+                carrier = document.flightInfo.carrier.value.trim();
+                flight = document.flightInfo.flight.value.trim();
+                year = document.flightInfo.year.value.trim();
+                month = document.flightInfo.month.value.trim();
+                day = document.flightInfo.day.value.trim();
+
+                var xmlhttp = getHTTPObject();
+                
+                document.getElementById("adiv").innerHTML = '';
+                document.getElementById("adiv3").innerHTML = '';
+                xmlhttp.onreadystatechange = function(){
+                    if(xmlhttp.readyState==4 && xmlhttp.status==200){
+                        document.getElementById("adiv").innerHTML = xmlhttp.responseText;
+                        if(button1==0){
+                            AddElement('button','find my friend');
+                            button1 = 1;
+                        }
+                    }
+                }
+                var url = 'search/'+carrier+'/'+flight+'/'+year+'/'+month+'/'+day;
+                xmlhttp.open('GET',url,true);
+                xmlhttp.send();
+                
+                //AddElement('button','find my friend');
+            }
+            
+            
+            
+        </script>
+    </head>
+    <body >
+        <form  method="post" onsubmit="getFlightStatus();return false;" name="flightInfo">
+            {% csrf_token %} 
+            carrier: <input type="text" name="carrier" id="carrier" />
+            <br />
+            flight: <input type="text" name="flight" id="flight"/>
+            <br />
+            year: <input type="text" name="year" id="year"/>
+            <br />
+            month: <input type="text" name="month" id="month"/>
+            <br />
+            day: <input type="text" name="day" id="day"/>
+            <br />
+            <input type="submit" value="Submit!" />
+            <br />
+        </form>
+        <div id="adiv"></div>
+        <div id="adiv2"></div>
+        <div id="adiv3"></div>
+        <div id="adiv4"></div>
+    </body>
+</html>
